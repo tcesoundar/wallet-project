@@ -1,4 +1,4 @@
-package com.wallet.exception;
+package com.wallet.exceptions;
 
 public class NegativeDebitValueException extends Exception {
 

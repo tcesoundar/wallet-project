@@ -1,39 +1,40 @@
 package com.wallet;
 
-import com.wallet.exception.CurrencyTypeNotFoundException;
+import com.wallet.exceptions.CurrencyTypeNotFoundException;
 
 import java.util.HashMap;
 
 public class CurrencyConverter {
 
-    private final HashMap<FromToPair,Double> exchangeRateMap;
+    private final HashMap<FromToPair,Double> exchangeRate;
 
     public CurrencyConverter() {
-        exchangeRateMap = new HashMap<>();
-        addExchangeRate();
+        exchangeRate = new HashMap<>();
+        constructExchangeRate();
     }
 
-    private void addExchangeRate() {
-        exchangeRateMap.put(new FromToPair("Rupee", "Dollar"), 74.85);
-        exchangeRateMap.put(new FromToPair("Rupee", "Pound"), 103.4);
-        exchangeRateMap.put(new FromToPair("Dollar", "Rupee"), 0.013);
-        exchangeRateMap.put(new FromToPair("Dollar", "Pound"), 1.40);
-        exchangeRateMap.put(new FromToPair("Pound", "Rupee"), 0.0096);
-        exchangeRateMap.put(new FromToPair("Pound", "Dollar"), 0.72);
+    private void constructExchangeRate() {
+        exchangeRate.put(new FromToPair("Rupee", "Dollar"), 74.85);
+        exchangeRate.put(new FromToPair("Rupee", "Pound"), 103.4);
+        exchangeRate.put(new FromToPair("Dollar", "Rupee"), 0.013);
+        exchangeRate.put(new FromToPair("Dollar", "Pound"), 1.40);
+        exchangeRate.put(new FromToPair("Pound", "Rupee"), 0.0096);
+        exchangeRate.put(new FromToPair("Pound", "Dollar"), 0.72);
     }
 
-    public double convert(Currency from, Currency to) throws CurrencyTypeNotFoundException {
+    public Currency convert(Currency from, Currency to) throws CurrencyTypeNotFoundException {
 
         String fromType = from.getType(from);
         String toType = to.getType(to);
 
         if(fromType.equals(toType))
-            return from.getValue();
+            return from;
 
-        for(FromToPair key: exchangeRateMap.keySet()) {
+        for(FromToPair key: exchangeRate.keySet()) {
             if(key.getFrom().equals(fromType) && key.getTo().equals(toType)) {
-                Double exchangeRate = exchangeRateMap.get(key);
-                return from.getValue()/exchangeRate;
+                Double exchangeRate = this.exchangeRate.get(key);
+                to.setValue(from.getValue()/exchangeRate);
+                return to;
             }
         }
 

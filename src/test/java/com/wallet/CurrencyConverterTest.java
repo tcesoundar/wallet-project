@@ -3,7 +3,7 @@ package com.wallet;
 import com.wallet.currencies.Dollar;
 import com.wallet.currencies.Pound;
 import com.wallet.currencies.Rupee;
-import com.wallet.exception.CurrencyTypeNotFoundException;
+import com.wallet.exceptions.CurrencyTypeNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +17,8 @@ class CurrencyConverterTest {
         Dollar dollar = new Dollar(1);
         Rupee rupee = new Rupee();
 
-        double actualValue = currencyConverter.convert(dollar, rupee);
+        Currency equivalentCurrency = currencyConverter.convert(dollar, rupee);
+        double actualValue = equivalentCurrency.getValue();
 
         assertEquals(expectedValue, actualValue, Math.abs(actualValue-expectedValue));
     }
@@ -29,7 +30,8 @@ class CurrencyConverterTest {
         Pound pound = new Pound(1);
         Rupee rupee = new Rupee();
 
-        double actualValue = currencyConverter.convert(pound, rupee);
+        Currency equivalentCurrency = currencyConverter.convert(pound, rupee);
+        double actualValue = equivalentCurrency.getValue();
 
         assertEquals(expectedValue, actualValue, Math.abs(actualValue-expectedValue));
     }
@@ -41,7 +43,8 @@ class CurrencyConverterTest {
         Rupee rupee = new Rupee(1);
         Dollar dollar = new Dollar();
 
-        double actualValue = currencyConverter.convert(rupee, dollar);
+        Currency equivalentCurrency = currencyConverter.convert(rupee, dollar);
+        double actualValue = equivalentCurrency.getValue();
 
         assertEquals(expectedValue, actualValue, Math.abs(actualValue-expectedValue));
     }
@@ -53,7 +56,8 @@ class CurrencyConverterTest {
         Pound pound = new Pound(1);
         Dollar dollar = new Dollar();
 
-        double actualValue = currencyConverter.convert(pound, dollar);
+        Currency equivalentCurrency = currencyConverter.convert(pound, dollar);
+        double actualValue = equivalentCurrency.getValue();
 
         assertEquals(expectedValue, actualValue, Math.abs(actualValue-expectedValue));
     }
@@ -65,7 +69,8 @@ class CurrencyConverterTest {
         Rupee rupee = new Rupee(1);
         Pound pound = new Pound();
 
-        double actualValue = currencyConverter.convert(rupee, pound);
+        Currency equivalentCurrency = currencyConverter.convert(rupee, pound);
+        double actualValue = equivalentCurrency.getValue();
 
         assertEquals(expectedValue, actualValue, Math.abs(actualValue-expectedValue));
     }
@@ -77,7 +82,8 @@ class CurrencyConverterTest {
         Dollar dollar = new Dollar(1);
         Pound pound = new Pound();
 
-        double actualValue = currencyConverter.convert(dollar, pound);
+        Currency equivalentCurrency = currencyConverter.convert(dollar, pound);
+        double actualValue = equivalentCurrency.getValue();
 
         assertEquals(expectedValue, actualValue, Math.abs(expectedValue-actualValue));
     }

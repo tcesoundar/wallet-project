@@ -2,21 +2,14 @@ package com.wallet.currencies;
 
 import com.wallet.Currency;
 
-public class Dollar implements Currency {
-
-    private final double dollarValue;
+public class Dollar extends Currency {
 
     public Dollar() {
-        dollarValue = 0;
+        super();
     }
 
-    public Dollar(double dollarValue) {
-        this.dollarValue = dollarValue;
-    }
-
-    @Override
-    public double getValue() {
-        return dollarValue;
+    public Dollar(double value) {
+        super(value);
     }
 
 }

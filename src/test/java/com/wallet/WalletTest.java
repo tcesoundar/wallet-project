@@ -3,10 +3,10 @@ package com.wallet;
 import com.wallet.currencies.Dollar;
 import com.wallet.currencies.Pound;
 import com.wallet.currencies.Rupee;
-import com.wallet.exception.CurrencyTypeNotFoundException;
-import com.wallet.exception.InsufficientAmountInWalletException;
-import com.wallet.exception.NegativeCreditValueException;
-import com.wallet.exception.NegativeDebitValueException;
+import com.wallet.exceptions.CurrencyTypeNotFoundException;
+import com.wallet.exceptions.InsufficientAmountInWalletException;
+import com.wallet.exceptions.NegativeCreditValueException;
+import com.wallet.exceptions.NegativeDebitValueException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,7 +49,8 @@ class WalletTest {
 
         wallet.credit(rupee);
         wallet.credit(dollar);
-        double actualValue = wallet.getAvailableAmount();
+        Currency preferredCurrency = wallet.getPreferredCurrency();
+        double actualValue = preferredCurrency.getValue();
 
         assertEquals(expectedValue, actualValue, Math.abs(expectedValue-actualValue));
 
@@ -66,9 +67,10 @@ class WalletTest {
         wallet.credit(rupee1);
         wallet.credit(dollar);
         wallet.credit(rupee2);
-        double availableAmountInWallet = wallet.getAvailableAmount();
+        Currency preferredCurrency = wallet.getPreferredCurrency();
+        double actualValue = preferredCurrency.getValue();
 
-        assertEquals(4, availableAmountInWallet);
+        assertEquals(4, actualValue);
 
     }
 
@@ -81,7 +83,8 @@ class WalletTest {
 
         boolean isDollarCredited = wallet.credit(dollar1);
         boolean isDollarDebited = wallet.debit(dollar2);
-        double actualValue = wallet.getAvailableAmount();
+        Currency preferredCurrency = wallet.getPreferredCurrency();
+        double actualValue = preferredCurrency.getValue();
 
         assertTrue(isDollarCredited);
         assertTrue(isDollarDebited);
@@ -149,7 +152,7 @@ class WalletTest {
         wallet.credit(pound1);
         boolean isPoundDebited = wallet.debit(pound2);
 
-        assertAll(() -> assertTrue(isPoundDebited), () -> assertEquals(2, wallet.getAvailableAmount()));
+        assertAll(() -> assertTrue(isPoundDebited), () -> assertEquals(2, wallet.getPreferredCurrency().getValue()));
 
     }
     

@@ -2,21 +2,14 @@ package com.wallet.currencies;
 
 import com.wallet.Currency;
 
-public class Pound implements Currency {
-
-    double poundValue;
+public class Pound extends Currency {
 
     public Pound() {
-        this.poundValue = 0;
+        super();
     }
 
-    public Pound(double poundValue) {
-        this.poundValue = poundValue;
-    }
-
-    @Override
-    public double getValue() {
-        return poundValue;
+    public Pound(double value) {
+        super(value);
     }
 
 }

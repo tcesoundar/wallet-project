@@ -2,21 +2,14 @@ package com.wallet.currencies;
 
 import com.wallet.Currency;
 
-public class Rupee implements Currency {
-
-    private final double rupeeValue;
+public class Rupee extends Currency {
 
     public Rupee() {
-        this.rupeeValue = 0;
+        super();
     }
 
-    public Rupee(double rupeeValue) {
-        this.rupeeValue = rupeeValue;
-    }
-
-    @Override
-    public double getValue() {
-        return rupeeValue;
+    public Rupee(double value) {
+        super(value);
     }
 
 }

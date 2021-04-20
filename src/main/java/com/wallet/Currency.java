@@ -1,10 +1,26 @@
 package com.wallet;
 
-public interface Currency {
+public abstract class Currency {
 
-    double getValue();
+    private double value;
 
-    default String getType(Currency currency) {
+    public Currency() {
+        this.value = 0;
+    }
+
+    public Currency(double value) {
+        this.value = value;
+    }
+
+    public double getValue(){
+        return this.value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
+    public String getType(Currency currency) {
         return currency.getClass().getSimpleName();
     }
 
