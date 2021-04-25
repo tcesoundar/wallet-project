@@ -5,22 +5,19 @@ import com.wallet.exceptions.InsufficientAmountInWalletException;
 import com.wallet.exceptions.NegativeCreditValueException;
 import com.wallet.exceptions.NegativeDebitValueException;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Wallet {
 
-    private final CurrencyConverter currencyConverter;
-    private final HashMap<String, Double> currencyTypeVsValue;
+    private final List<Currency> currencyList;
     private final Currency preferredCurrency;
     private double availableAmountInWallet;
 
     public Wallet(Currency preferredCurrency) {
-
         this.preferredCurrency = preferredCurrency;
-        currencyTypeVsValue = new HashMap<>();
+        currencyList = new ArrayList<>();
         availableAmountInWallet = 0;
-        currencyConverter = new CurrencyConverter();
-
     }
 
     public Currency getPreferredCurrency() {
@@ -30,11 +27,11 @@ public class Wallet {
 
     public boolean credit(Currency currency) throws NegativeCreditValueException, CurrencyTypeNotFoundException {
 
-        if(isNegative(currency.getValue())) {
+        if (isNegative(currency.getValue())) {
             throw new NegativeCreditValueException("Credit value should not be negative");
         }
 
-        Currency creditCurrency = currencyConverter.convert(currency, preferredCurrency);
+        Currency creditCurrency = currency.convert(currency, preferredCurrency);
         availableAmountInWallet += creditCurrency.getValue();
         creditToCorrespondingCurrencyType(currency);
         return true;
@@ -43,15 +40,15 @@ public class Wallet {
 
     public boolean debit(Currency currency) throws NegativeDebitValueException, InsufficientAmountInWalletException, CurrencyTypeNotFoundException {
 
-        if(isNegative(currency.getValue())) {
+        if (isNegative(currency.getValue())) {
             throw new NegativeDebitValueException("Debit value should not be Negative");
         }
 
-        if(isDebitValueExceedsWalletBalance(currency.getValue())) {
+        if (isDebitValueExceedsWalletBalance(currency.getValue())) {
             throw new InsufficientAmountInWalletException("Insufficient Amount in Wallet");
         }
 
-        Currency debitCurrency = currencyConverter.convert(currency, preferredCurrency);
+        Currency debitCurrency = currency.convert(currency, preferredCurrency);
         availableAmountInWallet -= debitCurrency.getValue();
         debitFromCorrespondingCurrencyType(currency);
         return true;
@@ -68,26 +65,32 @@ public class Wallet {
 
     private void creditToCorrespondingCurrencyType(Currency currency) {
 
-        String currencyType = currency.getType(currency);
+        CurrencyType currencyType = currency.getCurrencyType();
 
-        if (currencyTypeVsValue.containsKey(currencyType)) {
-            Double existingValue = currencyTypeVsValue.get(currencyType);
-            currencyTypeVsValue.put(currencyType, existingValue + currency.getValue());
-        } else {
-            currencyTypeVsValue.put(currencyType, currency.getValue());
+        for (Currency currencyObj : currencyList) {
+            if (currencyObj.getCurrencyType().equals(currencyType)) {
+                double existingValue = currencyObj.getValue();
+                double creditValue = currency.getValue();
+                currencyObj.setValue(existingValue + creditValue);
+            } else {
+                currencyList.add(currency);
+            }
         }
 
     }
 
     private void debitFromCorrespondingCurrencyType(Currency currency) throws CurrencyTypeNotFoundException {
 
-        String currencyType = currency.getType(currency);
+        CurrencyType currencyType = currency.getCurrencyType();
 
-        if(currencyTypeVsValue.containsKey(currencyType)) {
-            Double existingValue = currencyTypeVsValue.get(currencyType);
-            currencyTypeVsValue.put(currencyType, existingValue - currency.getValue());
-        } else {
-            throw new CurrencyTypeNotFoundException("Currency Type Not Found Exception");
+        for (Currency currencyObj : currencyList) {
+            if (currencyObj.getCurrencyType().equals(currencyType)) {
+                double existingValue = currencyObj.getValue();
+                double debitValue = currency.getValue();
+                currencyObj.setValue(existingValue - debitValue);
+            } else {
+                throw new CurrencyTypeNotFoundException("Currency Type Not Found Exception");
+            }
         }
 
     }
