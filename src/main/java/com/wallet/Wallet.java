@@ -1,7 +1,6 @@
 package com.wallet;
 
 import com.wallet.exceptions.CurrencyTypeNotFoundException;
-import com.wallet.exceptions.InsufficientAmountInWalletException;
 import com.wallet.exceptions.NegativeCreditValueException;
 import com.wallet.exceptions.NegativeDebitValueException;
 
@@ -11,87 +10,105 @@ import java.util.List;
 public class Wallet {
 
     private final List<Currency> currencyList;
-    private final Currency preferredCurrency;
-    private double availableAmountInWallet;
 
-    public Wallet(Currency preferredCurrency) {
-        this.preferredCurrency = preferredCurrency;
+    public Wallet() {
+
         currencyList = new ArrayList<>();
-        availableAmountInWallet = 0;
+
     }
 
-    public Currency getPreferredCurrency() {
-        preferredCurrency.setValue(availableAmountInWallet);
-        return preferredCurrency;
-    }
-
-    public boolean credit(Currency currency) throws NegativeCreditValueException, CurrencyTypeNotFoundException {
+    public boolean credit(Currency currency) throws NegativeCreditValueException {
 
         if (isNegative(currency.getValue())) {
+
             throw new NegativeCreditValueException("Credit value should not be negative");
+
         }
 
-        Currency creditCurrency = currency.convert(currency, preferredCurrency);
-        availableAmountInWallet += creditCurrency.getValue();
         creditToCorrespondingCurrencyType(currency);
         return true;
 
     }
 
-    public boolean debit(Currency currency) throws NegativeDebitValueException, InsufficientAmountInWalletException, CurrencyTypeNotFoundException {
+    public boolean debit(Currency currency) throws NegativeDebitValueException, CurrencyTypeNotFoundException {
 
         if (isNegative(currency.getValue())) {
+
             throw new NegativeDebitValueException("Debit value should not be Negative");
+
         }
 
-        if (isDebitValueExceedsWalletBalance(currency.getValue())) {
-            throw new InsufficientAmountInWalletException("Insufficient Amount in Wallet");
-        }
-
-        Currency debitCurrency = currency.convert(currency, preferredCurrency);
-        availableAmountInWallet -= debitCurrency.getValue();
         debitFromCorrespondingCurrencyType(currency);
         return true;
 
     }
 
+    public Currency getTotalAmount(Currency preferredCurrency) throws CurrencyTypeNotFoundException {
+
+        double totalAmountInPreferredCurrency = 0;
+
+        for (Currency fromCurrency : currencyList) {
+
+            Currency convertedCurrency = fromCurrency.convertTo(preferredCurrency);
+            totalAmountInPreferredCurrency += convertedCurrency.getValue();
+
+        }
+
+        preferredCurrency.setValue(totalAmountInPreferredCurrency);
+
+        return preferredCurrency;
+
+    }
+
     private boolean isNegative(double value) {
+
         return value <= 0;
+
     }
 
-    private boolean isDebitValueExceedsWalletBalance(double debitValue) {
-        return debitValue > getPreferredCurrency().getValue();
-    }
+    private void creditToCorrespondingCurrencyType(Currency creditCurrency) {
 
-    private void creditToCorrespondingCurrencyType(Currency currency) {
+        CurrencyType creditCurrencyType = creditCurrency.getCurrencyType();
 
-        CurrencyType currencyType = currency.getCurrencyType();
+        for (Currency currency : currencyList) {
 
-        for (Currency currencyObj : currencyList) {
-            if (currencyObj.getCurrencyType().equals(currencyType)) {
-                double existingValue = currencyObj.getValue();
-                double creditValue = currency.getValue();
-                currencyObj.setValue(existingValue + creditValue);
-            } else {
-                currencyList.add(currency);
+            CurrencyType currencyType = currency.getCurrencyType();
+
+            if (currencyType.equals(creditCurrencyType)) {
+
+                double existingValue = currency.getValue();
+                double creditValue = creditCurrency.getValue();
+                currency.setValue(existingValue + creditValue);
+                return;
+
             }
+
         }
 
+        currencyList.add(creditCurrency);
+
     }
 
-    private void debitFromCorrespondingCurrencyType(Currency currency) throws CurrencyTypeNotFoundException {
+    private void debitFromCorrespondingCurrencyType(Currency debitCurrency) throws CurrencyTypeNotFoundException {
 
-        CurrencyType currencyType = currency.getCurrencyType();
+        CurrencyType debitCurrencyType = debitCurrency.getCurrencyType();
 
-        for (Currency currencyObj : currencyList) {
-            if (currencyObj.getCurrencyType().equals(currencyType)) {
-                double existingValue = currencyObj.getValue();
-                double debitValue = currency.getValue();
-                currencyObj.setValue(existingValue - debitValue);
-            } else {
-                throw new CurrencyTypeNotFoundException("Currency Type Not Found Exception");
+        for (Currency currency : currencyList) {
+
+            CurrencyType currencyType = currency.getCurrencyType();
+
+            if (currencyType.equals(debitCurrencyType)) {
+
+                double existingValue = currency.getValue();
+                double debitValue = debitCurrency.getValue();
+                currency.setValue(existingValue - debitValue);
+                return;
+
             }
+
         }
+
+        throw new CurrencyTypeNotFoundException("Currency Type Not Found Exception");
 
     }
 
